@@ -6,6 +6,7 @@ using MinimalApi.Dominio.Servicos;
 using Microsoft.AspNetCore.Mvc;
 using MinimalApi.ModelViews;
 using MinimalApi.Dominio.Entidades;
+using MinimalApi.Dominio.Enuns;
 
 #region Builder
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,47 @@ app.MapPost("administradores/login", ([FromBody] LoginDTO loginDTO, IAdministrad
     {
         return Results.Unauthorized();
     }
+}).WithTags("Administradores");
+
+app.MapPost("/administradores", ([FromBody] AdministradorDTO administradorDTO, IAdministradorServico administradorServico) =>
+{
+    var validacao = new ErrorsDeValidacao
+    {
+        Mensagens = new List<string>()
+    };
+
+    if (string.IsNullOrEmpty(administradorDTO.Email))
+    {
+        validacao.Mensagens.Add("Email não pode ser vazio");
+    }
+
+    if (string.IsNullOrEmpty(administradorDTO.Senha))
+    {
+        validacao.Mensagens.Add("Senha não pode ser vazia");
+    }
+
+    if (administradorDTO.Perfil == null)
+    {
+        validacao.Mensagens.Add("Perfil não pode ser vazio");
+    }
+
+    if (validacao.Mensagens.Count > 0)
+    {
+        return Results.BadRequest(validacao);
+    }
+
+    var veiculo = new Administrador
+    {
+        Email = administradorDTO.Email,
+        Senha = administradorDTO.Senha,
+        Perfil = administradorDTO.Perfil.ToString() ?? Perfil.editor.ToString()
+    };
+    administradorServico.Incluir(veiculo);
+    
+
+    return Results.Created($"/administrador/{veiculo.Id}", veiculo);
+
+    
 }).WithTags("Administradores");
 #endregion
 
