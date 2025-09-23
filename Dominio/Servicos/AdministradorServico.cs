@@ -13,6 +13,11 @@ public class AdministradorServico : IAdministradorServico
         _contexto = contexto;
     }
 
+    public Administrador? BuscaPorId(int id)
+    {
+        return _contexto.Administradores.Where(v => v.Id == id).FirstOrDefault();
+    }
+
     public Administrador Incluir(Administrador administrador)
     {
         _contexto.Administradores.Add(administrador);

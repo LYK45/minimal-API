@@ -37,6 +37,31 @@ app.MapPost("administradores/login", ([FromBody] LoginDTO loginDTO, IAdministrad
     }
 }).WithTags("Administradores");
 
+app.MapGet("/administradores", ([FromQuery] int? pagina, IAdministradorServico administradorServico) =>
+{
+    var adms = new List<AdministradorModelView>();
+    var administradores = administradorServico.Todos(pagina);
+    foreach (var adm in administradores)
+    {
+        adms.Add(new AdministradorModelView
+        {
+            Id = adm.Id,
+            Email = adm.Email,
+            Perfil = adm.Perfil
+        });
+    }
+    return Results.Ok(adms);
+}).WithTags("Administradores");
+
+app.MapGet("/Administradores/{id}", ([FromRoute] int id, IAdministradorServico administradorServico) =>
+{
+    var administrador = administradorServico.BuscaPorId(id);
+
+    if (administrador == null) return Results.NotFound();
+
+    return Results.Ok(administrador);
+}).WithTags("Administradores");
+
 app.MapPost("/administradores", ([FromBody] AdministradorDTO administradorDTO, IAdministradorServico administradorServico) =>
 {
     var validacao = new ErrorsDeValidacao
@@ -68,7 +93,7 @@ app.MapPost("/administradores", ([FromBody] AdministradorDTO administradorDTO, I
     {
         Email = administradorDTO.Email,
         Senha = administradorDTO.Senha,
-        Perfil = administradorDTO.Perfil.ToString() ?? Perfil.editor.ToString()
+        Perfil = administradorDTO.Perfil.ToString() ?? Perfil.Editor.ToString()
     };
     administradorServico.Incluir(veiculo);
     
