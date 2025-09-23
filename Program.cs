@@ -107,7 +107,8 @@ app.MapPost("/administradores", ([FromBody] AdministradorDTO administradorDTO, I
 #region Veiculos
 ErrorsDeValidacao validaDTO(VeiculoDTO veiculoDTO)
 {
-    var validacao = new ErrorsDeValidacao{
+    var validacao = new ErrorsDeValidacao
+    {
         Mensagens = new List<string>()
     };
 
